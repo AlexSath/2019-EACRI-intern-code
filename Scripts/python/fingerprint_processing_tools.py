@@ -75,5 +75,4 @@ def ask_for_path(specification):
     while (path_exists != 1):
         directory_path = input('Please try again: ')
         path_exists = check_if_directory_exists(directory_path)
-    print(directory_path)
     return directory_path

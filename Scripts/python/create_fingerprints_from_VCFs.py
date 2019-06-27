@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import itertools
 import fingerprint_processing_tools
@@ -8,15 +9,15 @@ current_dir_path = os.path.dirname(current_file_path)
 vcf_directory = ""
 
 def main():
-    print('\n --PLEASE PUT ALL PATHS IN SINGLE QUOTES-- \n')
     vcf_directory = fingerprint_processing_tools.ask_for_path('containing desired .vcf.gz files')
+    #vcf_directory = sys.argv[1]
     output_directory = fingerprint_processing_tools.ask_for_path('where fingerprints will output')
+    #output_directory = sys.argv[2]
 
     print('Retrieving VCF file paths...')
     vcf_file_paths = retrieve_vcf_files(vcf_directory, 1)
     print('Retrieving VCF file names...')
     vcf_file_names = retrieve_vcf_files(vcf_directory, 0)
-    print(vcf_file_names)
 
     for (n, p) in zip(vcf_file_names, vcf_file_paths):
         print('Creating fingerprint for {}...'.format(n))
