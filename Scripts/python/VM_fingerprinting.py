@@ -1,12 +1,12 @@
 import os
-import fingerprint_processing_tools
+import fingerprint_processing_tools as /fpt
 import subprocess
 import itertools
 
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
 bucket_to_search = input("Please type the path of the desired bucket in single quotes:")
-dir_to_populate = fingerprint_processing_tools.ask_for_path("where you would like the .vcfs to output")
+dir_to_populate = fpt.ask_for_path("where you would like the .vcfs to output")
 GCP_VCF_paths = []
 os_file_paths = []
 
@@ -36,7 +36,7 @@ def main():
     while (current_path != num_paths):
         print(str(current_path) + " " + GCP_VCF_paths[current_path][15:-11])
         path_to_create = os.path.join(dir_to_populate, GCP_VCF_paths[current_path][15:-11])
-        fingerprint_processing_tools.create_dir_if_absent(path_to_create)
+        fpt.create_dir_if_absent(path_to_create)
 
         os_file_paths.append(os.path.join(dir_to_populate, GCP_VCF_paths[current_path][15:]))
         current_path += 1
@@ -51,5 +51,5 @@ def main():
     #subprocess.Popen(["gsutil", "cp", GCP_VCF_paths[1]])
     #subprocess.Popen(["gsutil", "cp", GCP_VCF_paths[0]])
 
-
-main()
+if __name__ == "__main__":
+    main()

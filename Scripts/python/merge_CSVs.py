@@ -1,7 +1,7 @@
 import os
 import itertools
 import csv
-import fingerprint_processing_tools
+import fingerprint_processing_tools as fpt
 
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
@@ -36,8 +36,9 @@ def main():
     create_all_comparisons_csv()
     return 0
 
+
 def add_file_name_as_row(path_to_tsv, tsv_file_name):
-    name_added_dir_path = fingerprint_processing_tools.create_dir_if_absent(os.path.join(dir_with_comparisons, "tsvs_with_name_rows"))
+    name_added_dir_path = fpt.create_dir_if_absent(os.path.join(dir_with_comparisons, "tsvs_with_name_rows"))
     name_added_file_path = os.path.join(name_added_dir_path, tsv_file_name[:-4] + ".rowadd")
 
     fout = open(name_added_file_path, "w+")
@@ -54,7 +55,7 @@ def add_file_name_as_row(path_to_tsv, tsv_file_name):
 
 
 def remove_top_row(tsv_file_path, tsv_file_name):
-    row_removed_dir_path = fingerprint_processing_tools.create_dir_if_absent(os.path.join(dir_with_comparisons, "row_removed_tsvs"))
+    row_removed_dir_path = fpt.create_dir_if_absent(os.path.join(dir_with_comparisons, "row_removed_tsvs"))
     row_removed_file_path = os.path.join(row_removed_dir_path, tsv_file_name[:-4] + ".rmvd")
 
     fout = open(row_removed_file_path, "w+")
@@ -121,4 +122,5 @@ def create_all_comparisons_csv():
     print("Created and populated all_comparisons.csv")
 
 
-main()
+if __name__ == "__main__":
+    main()

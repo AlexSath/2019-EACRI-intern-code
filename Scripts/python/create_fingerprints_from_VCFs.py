@@ -2,18 +2,14 @@ import os
 import sys
 import subprocess
 import itertools
-import fingerprint_processing_tools
+import fingerprint_processing_tools as fpt
 
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
-vcf_directory = ""
+vcf_directory = sys.argv[1]
+output_directory = sys.argv[2]
 
 def main():
-    vcf_directory = fingerprint_processing_tools.ask_for_path('containing desired .vcf.gz files')
-    #vcf_directory = sys.argv[1]
-    output_directory = fingerprint_processing_tools.ask_for_path('where fingerprints will output')
-    #output_directory = sys.argv[2]
-
     print('Retrieving VCF file paths...')
     vcf_file_paths = retrieve_vcf_files(vcf_directory, 1)
     print('Retrieving VCF file names...')
@@ -21,10 +17,10 @@ def main():
 
     for (n, p) in zip(vcf_file_names, vcf_file_paths):
         print('Creating fingerprint for {}...'.format(n))
-        subprocess.call(["perl", fingerprint_processing_tools.find_file_path(current_dir_path, "computeDMF.pl", 2), n, p])
+        subprocess.call(["perl", fpt.find_file_path(current_dir_path, "computeDMF.pl", 2), n, p])
 
-    print(fingerprint_processing_tools.find_file_path(current_dir_path, "computeDMF.pl", 2))
-    subprocess.call(["bash", fingerprint_processing_tools.find_file_path(current_dir_path, "organizeFingerprints.sh", 2), output_directory])
+    print(fpt.find_file_path(current_dir_path, "computeDMF.pl", 2))
+    subprocess.call(["bash", fpt.find_file_path(current_dir_path, "organizeFingerprints.sh", 2), output_directory])
 
 
 '''
@@ -49,10 +45,16 @@ def retrieve_vcf_files(vcf_path, is_path):
                     if (file_no_slash[num_path_terms - 2] == "exome"): #if the file's parent directory is called exome, then append.
                         files.append(file_path)
         else: #if finding file names, go here;
+            for file in f:
+                if '_filtered_' in file:
+                    files.append(file[:-7])
+                else:
+                    break
             for dir in d:
                 folder_parent = os.path.abspath(os.path.join(r, dir, ".."))
                 if (folder_parent == os.path.abspath(vcf_path)):
                     files.append(dir)
     return files
 
-main()
+if __name__ == "__main__":
+    main()
