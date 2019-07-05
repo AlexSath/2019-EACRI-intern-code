@@ -4,17 +4,16 @@
 import os
 import subprocess
 import itertools
-import scipy.misc
-import sys
 import fingerprint_processing_tools as fpt
 
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
 twice_parent_folder_path = os.path.join(current_dir_path, "..", "..")
-fingerprint_location = sys.argv[1] #First argument is the directory where the fingerprints are found. Nested folders ok.
-comparisons_folder_path = sys.argv[2] #The directory where the fingerprint comparisons will be outputted and organized
+global fingerprint_location
 
 def main():
+    fingerprint_location = fpt.ask_for_path('where the fingerprints are found')
+
     fingerprint_paths = [] #array containing the path of all of the fingerprints that will be compared
     fingerprint_paths = find_fingerprint_paths(fingerprint_location, 1)
     fingerprint_names = [] #array where the names of the fingerprints that will be compared
@@ -43,19 +42,19 @@ def find_fingerprint_paths(fingerprint_dir_path, is_path):
                     file_paths.append(file)
     return file_paths
 
-'''A function that compares each fingerprint file in a folder with every other
-fingerprint file in the same folder using nested for loops.'''
+
 def compare_fingerprints(fingerprint_path_array, fingerprint_name_array, compare_dir):
+    comparisons_folder_path = fpt.create_dir_if_absent(os.path.join(compare_dir, "..", "Comparisons"))
     script_path = fpt.find_file_path(current_dir_path, "compareDMFs.pl", 2)
     misc_tsvs_path = fpt.create_dir_if_absent(os.path.join(comparisons_folder_path, "misc_tsvs"))
 
-    #this loop goes through both name and path arrays and uses compareDMFs.pl
-    #to compare each fingerprint with each other fingerprint if it doesn't exist
-    current_comp_number = 1
-    num_comparisons = fpt.ncr(len(fingerprint_path_array), 2)
-    for (p, n) in zip(fingerprint_path_array, fingerprint_name_array):
-        for (p2, n2) in zip(fingerprint_path_array, fingerprint_name_array):
-            print(f'Comparing {n} with {n2}... [{current_comp_number}/{num_comparisons + len(fingerprint_path_array)}]') #so you know what is going on...
+    '''this loop goes through both name and path arrays and uses compareDMFs.pl
+    to compare each fingerprint with each other fingerprint if it doesn't exist'''
+    #these nested loops use Itertools to associate each path with its associated fingerprint name
+    for (p, n) in zip(fingerprint_path_array[::-1], fingerprint_name_array[::-1]):
+        for (p2, n2) in zip(fingerprint_path_array[::-1], fingerprint_name_array[::-1]):
+
+            print('Comparing {} with {}...'.format(n, n2)) #so you know what is going on...
 
             output_file_path = os.path.join(misc_tsvs_path, n + "~" + n2 + ".tsv")
             reverse_file_path = os.path.join(misc_tsvs_path, n2 + "~" + n + ".tsv")
@@ -67,13 +66,11 @@ def compare_fingerprints(fingerprint_path_array, fingerprint_name_array, compare
             else: #if the comparison doesn't exist, create the csv and fill it with comparison data.
                 file_output = open(output_file_path, "w+")
                 subprocess.call(["perl", script_path, p, p2], stdout=file_output)
-                current_comp_number += 1
 
 
-'''Creates comparisons based on a .csv file tumor_normal key.
-   --! NOT CURRENTLY USED IN THIS ITERATION OF THE PIPELINE !-- '''
+'''Creates comparisons based on a .csv file tumor_normal key.'''
 def compare_fingerprints_from_key(fingerprint_path_array, fingerprint_name_array, key_path):
-    comparisons_folder_path = fpt.create_dir_if_absent(os.path.join(twice_parent_folder_path, "Key_Comparisons"))
+    comparisons_folder_path = fpt.create_dir_if_absent(os.path.join(fingerprint_location, "..", "Comparisons"))
     script_path = fpt.find_file_path(current_dir_path, "compareDMFs.pl", 2)
     misc_tsvs_path = fpt.create_dir_if_absent(os.path.join(comparisons_folder_path, "misc_tsvs"))
 
@@ -108,9 +105,6 @@ def compare_fingerprints_from_key(fingerprint_path_array, fingerprint_name_array
         current_line += 1
 
 
-'''This function uses the name array to create a file that lists the names of
-the fingerprints used to created comparisons. The file is stored in the folder
-in which the fingerprints are found.'''
 def mk_fngp_name_file(output_path, name_array):
     fout = open(os.path.join(output_path, 'fingerprint_names.csv'), "w+")
 

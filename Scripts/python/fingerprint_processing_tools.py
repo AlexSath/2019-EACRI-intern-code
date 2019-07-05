@@ -1,10 +1,22 @@
+#!/bin/env/python
+#Created by Alex R. Sathler for the EACRI
+#Perl Script for computing genome fingerprints found at /gglusman/genome-fingerprints/ on GitHub
+#fingerprint_processing_tools.py is a function library for use in other fingerprinting scripts
 import os
 import itertools
 import csv
+import operator as op
+from functools import reduce
 
 current_file_path = os.path.abspath(__file__)
 current_dir_path = os.path.dirname(current_file_path)
 
+'''This function will take a directory path as an argument and make that directory
+in addition to any necessary parent folders
+
+dir_path: The path of the directory to be created. Can include parent folders
+that have not yet been created
+'''
 def create_dir_if_absent(dir_path):
     if (os.path.isdir(dir_path)):
         pass
@@ -76,3 +88,10 @@ def ask_for_path(specification):
         directory_path = input('Please try again: ')
         path_exists = check_if_directory_exists(directory_path)
     return directory_path
+
+'''A simple nCr function'''
+def ncr(n, r): #From StackOverflow user dheerosaur
+    r = min(r, n-r)
+    numer = reduce(op.mul, range(n, n-r, -1), 1)
+    denom = reduce(op.mul, range(1, r+1), 1)
+    return numer / denom

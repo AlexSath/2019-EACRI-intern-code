@@ -1,3 +1,6 @@
+#!/usr/bin/python
+#Created by Alex R. Sathler for the EACRI
+#Perl Script for computing genome fingerprints found at /gglusman/genome-fingerprints/ on GitHub
 import os
 import gzip
 import shutil
@@ -8,65 +11,89 @@ import fingerprint_processing_tools as fpt
 import create_fingerprints_from_VCFs as cffV
 
 current_file_path = os.path.abspath(__file__)
-dir_to_search = sys.argv[1]
-dir_to_copy_to = sys.argv[2]
-min_allele_depth = int(sys.argv[3])
-min_allele_freq = float(sys.argv[4])
-min_time_genes_read = int(sys.argv[5])
+dir_to_search = sys.argv[1] #The folder where the raw .vcf.gz files are found. Nested folders O.K.
+dir_to_copy_to = sys.argv[2]  #The folder in which the filtered .vcf.gz files will output.
+# - - - - - - - - - - - - - - #File/Folder hierarchies will be copied from the first folder
+min_allele_depth = int(sys.argv[3]) #Minimum number of reads for a line to be copied to the new file
+min_allele_freq = float(sys.argv[4]) #Minimum percentage of variant reads for a line to be copied to the new file
+min_time_genes_read = int(sys.argv[5]) #Minimum number of reads at the locus for a line to be copied to the new file
 
 class Header: #The header class contains all of the information necessary to process the VCF
     file_path = ""
-    line_number = 0
+    line_number = 0 #The file line number at which the header is located
     columns = []
-    format_position = 0
-    algorithm_types = []
+    format_position = 0 #The position of the 'FORMAT' column
+    algorithm_types = [] #An array of the different algorithms that were used to read the genome.
 
 
 def main():
-    vcf_file_paths = cffV.retrieve_vcf_files(dir_to_search, 1)
-    vcf_file_names = cffV.retrieve_vcf_files(dir_to_search, 0)
+    print('Retrieving VCF file paths...') #Retrieve all .vcf.gz paths from the desired folder
+    vcf_file_paths = cffV.retrieve_vcf_files(dir_to_search, 0)
+    print('Retrieving VCF file names...') #Retrieve the names of the .vcf.gz files
+    vcf_file_names = cffV.retrieve_vcf_files(dir_to_search, 2)
 
+    #Main loop of this file - iterates through filepath/filename pairs and
+    #finds the desired output location for the new .vcf file. It then creates
+    #a header for the input file, filters the input, outputs to the desired
+    #directory with the same folder hierarchy, and gzips the output file.
+    #NOTE: THIS ASSUMES THE INPUT DIRECTORY AND OUTPUT DIRECTORY ARE AT THE SAME LEVEL IN THE HIERARCHY
+    current_VCF = 1
     for path, name in zip(vcf_file_paths, vcf_file_names):
         file_path_array = path.split("/")
         copy_dir_array = dir_to_copy_to.split("/")
-        make_path_arr = []
+        make_path_arr = [] #Declaration of array with the new path
         current_dir_level = 0
-        while (current_dir_level <= len(copy_dir_array) - 2):
+        #Use the path of the ouput directory as a parent for the other dirs
+        while (current_dir_level <= len(copy_dir_array) - 1):
             make_path_arr.append(copy_dir_array[current_dir_level])
             current_dir_level += 1
+        #Once you have reached the output directory level of the hierarchy,
+        #append the dir structure of the input
         while (current_dir_level <= len(file_path_array) - 2):
             make_path_arr.append(file_path_array[current_dir_level])
             current_dir_level += 1
 
+        #Creating the full dir path of the file output:
         make_dir_path = "/" + os.path.join(*make_path_arr)
         os.makedirs(make_dir_path, exist_ok=True)
 
-        gunzip_path = os.path.join(make_dir_path, name + ".vcf")
+        #Defining the .vcf output path of the gzipped raw vcf:
+        gunzip_output_path = os.path.join(make_dir_path, name + ".vcf")
 
-        print(f"Unzipping {path} to {gunzip_path}.vcf")
+        #Opening the raw .vcf.gz into the desired output path
         with gzip.open(path, "rb") as fin:
-            with open(gunzip_path, "wb+") as fout:
+            with open(gunzip_output_path, "wb+") as fout:
                 shutil.copyfileobj(fin, fout)
-
         fin.close()
         fout.close()
 
-        vcf_header = get_header_info(gunzip_path) #Create a header using the desired .vcf file
+        #Console info, declaring the Header for the raw .vcf to be filtered,
+        #filtering the raw .vcf and returning the path of the filter process output
+        print(f"Filtering {name}.vcf... [{current_VCF}/{len(vcf_file_names)}]")
+        vcf_header = get_header_info(gunzip_output_path) #Create a header using the desired .vcf file
         file_to_gzip = parse_vcf(vcf_header)
 
-        print(f"Zipping {name}.vcf to {name}.vcf.gz")
-        with open(gunzip_path, "rb") as fin:
+        #Gzipping the new filtered .vcf file
+        with open(file_to_gzip, "rb") as fin:
             with gzip.open(file_to_gzip + ".gz", "wb") as fout:
                 shutil.copyfileobj(fin, fout)
-
-        gzip_target_array = file_to_gzip.split("/")
-        print(f"Deleting {gzip_target_array[len(gzip_target_array) - 1]}...")
-        os.remove(file_to_gzip)
-        os.remove(gunzip_path)
         fin.close()
         fout.close()
 
+        #Removing unnecessary files and iterating to the next version of the loop
+        os.remove(gunzip_output_path)
+        os.remove(file_to_gzip)
+        current_VCF += 1
 
+
+'''A complex .vcf filter function that reads every line (which contains one read
+at a specified locus) and parses the line into the information needed to decide
+if the line should be outputted into the new .vcf file. The allele depth, allele
+frequency, and number of allele read cutoffs are arguments during the script call.
+
+Header: A header-class object who's path is used to determine the output .vcf
+file path
+'''
 def parse_vcf(Header):
     fin = open(Header.file_path, "r") #input is the desired .vcf file
     fout_path = f"{Header.file_path[:-4]}_filtered_{str(min_allele_depth)}_{str(min_allele_freq)}_{str(min_time_genes_read)}.vcf"
@@ -74,86 +101,116 @@ def parse_vcf(Header):
     passed_header = False #to know if the script is still in the header portion of the VCF file
 
     for line in fin:
+        #Declaring necessary variables:
         allele_depth_ok = False
         allele_freq_ok = False
         num_calls_ok = False
         line_allele_depth = 0
         line_allele_freq = 0.0
         time_gene_read = 0
+        line_alg_data = []
 
-        line_array = line.replace("\n", "").split("\t") #parse the line by tabs into an array; remove the newline character
+        #Split tab-separated line into an array and remove newline characters:
+        line_array = line.replace("\n", "").split("\t")
 
-        if (line_array == Header.columns): #if the line array is the same as the header's columns, then this line is the header
+        #if the line array is the same as the header's columns, then this line is the header:
+        if (line_array == Header.columns):
             passed_header = True #the current line is the header, so passed_header can be set to True
             fout.write(line)
         else: #if the current line is not the column header...
             if (passed_header == False):
-                fout.write(line) #If the header hasn't been passed, do write to the file
+                #If the header hasn't been passed, do write to the file:
+                fout.write(line)
 
             else:
-                '''If the header has been passed, then the formats can be processed
-                 - The line_ref_array variable is the reference for the data produced by the algorithms
-                 - It is in the same tab number as the "FORMAT" in the column_array
-                 - The format must be split into references by colons, according to .vcf standards'''
+                # If the header has been passed, then the formats can be processed
+                # - The line_ref_array variable is the reference for the data produced by the algorithms
+                # - It is in the same tab number as the "FORMAT" in the file's column_array
+                # - The format must be split into references by colons, according to .vcf standards
                 line_ref_array = line_array[Header.format_position].split(":")
                 line_depth_freq = determine_data_format(line_ref_array)
                 location_depth_freq = [[], []]
 
-                for r in line_depth_freq[0]: #find locations of allele depth data
+                #find locations of allele depth data:
+                for r in line_depth_freq[0]:
                     location_index = str_num_in_array(line_ref_array, r)
                     location_depth_freq[0].append(location_index)
 
-                for r in line_depth_freq[1]: #find locations of allele frequency data
+                #find locations of allele frequency data:
+                for r in line_depth_freq[1]:
                     location_index = str_num_in_array(line_ref_array, r)
                     location_depth_freq[1].append(location_index)
 
+                #Getting read algorithm data and declaring depth and freq arrays
                 line_alg_data = get_line_alg_data(line_array, len(line_array), Header.format_position)
                 allele_depth = []
                 allele_freq = []
 
+
+                #Loop that iterates through each piece of algorithm data and parses
+                #it to find what each algorithm says about the line read in terms of
+                #depth and freqeuency
                 times_gene_absent = 0
                 for alg_data in line_alg_data:
                     alg_data = alg_data.split(":")
 
+                    #If "./." is in the data, then log that the read is absent
                     if "./." in alg_data:
                         times_gene_absent += 1
 
                     now_depth = True
+                    #Iterate through string/string location pairs within their
+                    #respective arrays and search for key strings. When a key
+                    #string is found, use its location index to extract its
+                    #corresponding data
                     for string, index in zip(line_depth_freq, location_depth_freq):
-                        while (now_depth == True): #When you are dealing with allele depth:
+                        #When you are dealing with allele depth:
+                        while (now_depth == True):
                             for s, i in zip(string, index):
                                 if (s == "DP") and (alg_data[i] != "."):
                                     allele_depth.append(int(alg_data[i]))
-                            now_depth = False #Tell the script you are no long in allele depth
+                            now_depth = False #Tell the script you are no longer in allele depth
+                        #When moving on to allele frequency from allele depth:
                         if "FREQ" in string:
                             for s, i in zip(string, index):
                                 if (s == "FREQ") and (alg_data[i] != "."):
                                     freq_string = alg_data[i]
+                                    #FREQ uses % format - get rid of the special character:
                                     allele_freq.append(float(freq_string.replace("%", "")))
+                        #When both 'AD' and 'VD' are in the string, one is for regular reads,
+                        #the other for variant reads
                         if "AD" in string and "VD" in string:
                             for s, i in zip(string, index):
                                 try:
+                                    #Assign the necessary variables:
                                     if (s == "RD") and (alg_data[i] != "."):
                                         regular_reads = alg_data[i]
                                     elif (s == "AD") and (alg_data[i] != "."):
                                         alternate_reads = alg_data[i]
+                                    #Calculate the allele freq (=alt/(norm+alt)):
                                     allele_freq.append(float( (int(alternate_reads) / (int(regular_reads)+int(alternate_reads)) )*100 ))
                                 except:
                                     continue
+                        #If only 'AD' is in the string, normal and variant reads are separated by a comma:
                         if "AD" in string:
                             for s, i in zip(string, index):
                                 try:
                                     if (s == 'AD') and (alg_data[i] != "."):
+                                        #Split by the comma and assign normal and variant data to variables
                                         reads = alg_data[i].split(",")
                                         regular_reads = reads[0]
                                         alternate_reads = reads[1]
+                                        #Calculate the allele frequency as in the above case:
                                         allele_freq.append(float( (int(alternate_reads) / (int(regular_reads)+int(alternate_reads)) )*100 ))
                                 except:
                                     continue
+                        #If only 'VD' is found, then it is expressing the number of variant reads
+                        #and total allele depth will need to be leveraged for allele frequency calculation
                         if "VD" in string:
                             for s, i in zip(string, index):
                                 try:
                                     if (s == "VD") and (alg_data[i] != "."):
+                                        #Allele freq = alt/(depth+alt)
                                         allele_freq.append(float( (int(alg_data[i]) / (int(alg_data[i])+allele_depth) )*100 ))
                                 except:
                                     continue
@@ -161,22 +218,30 @@ def parse_vcf(Header):
                             continue
                     #End <string, index> for loop
                 #End <alg_data> for loop
+
+                #Calculate the number of reads at the locus:
                 time_gene_read = len(alg_data) - times_gene_absent
+                #Average the deth and frequency values stored in their respective arrays:
                 if allele_freq is not None and allele_depth is not None:
                     line_allele_freq = average_array_value(allele_freq)
                     line_allele_depth = average_array_value(allele_depth)
+
             #End <passed_header> if statement
         #End <Header.columns> if statement
 
-        if (time_gene_read >= 2) and (line_allele_freq >= min_allele_freq) and (line_allele_depth >= min_allele_depth):
+        #If the line meets the necessary conditions, write it to the output file:
+        if (time_gene_read >= min_time_genes_read) and \
+           (line_allele_freq >= min_allele_freq) and \
+           (line_allele_depth >= min_allele_depth):
             fout.write(line)
+
     #End <line> for loop
 
     fin.close()
     fout.close()
     return fout_path
 
-
+'''Function that takes the integers or floats in an array and reterns their average'''
 def average_array_value(array):
     average = 0.0
 
@@ -189,7 +254,9 @@ def average_array_value(array):
 
     return average
 
-
+'''Function that sorts through a data format array and looks for key two letter
+codes. These codes are stored in a two-dimentional array. First dimention for
+letters to do with read depth, second dimention to do with allele frequency'''
 def determine_data_format(ref_array):
     allele_depth_type = []
     allele_freq_type = []
@@ -211,7 +278,8 @@ def determine_data_format(ref_array):
     depth_freq_type = [allele_depth_type, allele_freq_type]
     return depth_freq_type
 
-
+'''A function that takes an array and find the number location of the string
+in the array. Will return 0 if the string is not found.'''
 def str_num_in_array(array, str_to_find):
     str_location = 0
 
@@ -223,7 +291,8 @@ def str_num_in_array(array, str_to_find):
 
     return str_location
 
-
+'''A function that uses the column array and the format column number to return
+all of the algorithm data after the format column'''
 def get_line_alg_data(line_array, array_length, column_num):
     alg_data = []
 
@@ -234,8 +303,10 @@ def get_line_alg_data(line_array, array_length, column_num):
 
     return alg_data
 
-
+'''This function initializes a Header object by filling its variables with data
+from a file provided with the file_input variable'''
 def get_header_info(file_input):
+    #Finds the line number at which the header is found
     def get_header_line_number(file_input):
         line_number = 0
         fin = open(file_input, "r")
@@ -248,6 +319,7 @@ def get_header_info(file_input):
         fin.close()
         return line_number
 
+    #Finds header line and separates the individual columns by tabs and stores them in an array
     def get_column_array(file_input, line_number):
         column_array = []
         header_line = linecache.getline(file_input, line_number)
@@ -255,6 +327,7 @@ def get_header_info(file_input):
         linecache.clearcache()
         return column_array
 
+    #Finds the position of the 'Format' column (what number is it in the header?)
     def get_format_position(file_input, column_array):
         format_position = 0
         curr_column = 0
@@ -264,6 +337,8 @@ def get_header_info(file_input):
             curr_column += 1
         return format_position
 
+    #Finds the names of the .vcf read algorithms, which are found after the 'Format column'
+    #Stores this information in an array
     def get_header_algorithms(column_array, format_position):
         algorithm_array = []
         num_columns = len(column_array)
@@ -277,13 +352,15 @@ def get_header_info(file_input):
             current_algorithm += 1
         return algorithm_array
 
-    new_header = Header()
+    new_header = Header() #Initialize the new header object
+    #Populating the new Header object with variables:
     new_header.file_path = file_input
     new_header.line_number = get_header_line_number(new_header.file_path)
     new_header.columns = get_column_array(new_header.file_path, new_header.line_number)
     new_header.format_position = get_format_position(new_header.file_path, new_header.columns)
     new_header.algorithm_types = get_header_algorithms(new_header.columns, new_header.format_position)
 
+    #Function returns the new Header object, fully populated
     return new_header
 
 if __name__ == "__main__":
