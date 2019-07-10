@@ -12,7 +12,7 @@ current_dir_path = os.path.dirname(current_file_path)
 vcf_directory = sys.argv[1] #First argument is where the .vcf files can be found (nested folders are ok)
 output_directory = sys.argv[2] # Second argument is where the .vcf files will be placed. Subfolders will be created to organize some files
 filtered_or_not = 'False'
-filtered_or_not = sys.argv[3] #Third argument tells the function whether or not the .vcfs are filtered or not
+filtered_or_not = sys.argv[3].lower().strip() #Third argument tells the function whether or not the .vcfs are filtered or not
 vcf_file_paths = []
 vcf_file_names = []
 
@@ -21,7 +21,7 @@ def main():
     vcf_file_paths = retrieve_vcf_files(vcf_directory, 0) #An array of absolute .vcf file paths
     print('Retrieving VCF file names...')
     #If the .vcfs are filtered, then use the second case of the funciton, if not, use the third
-    if (filtered_or_not == 'True'):
+    if (filtered_or_not == 'true'):
         vcf_file_names = retrieve_vcf_files(vcf_directory, 1) #An array of .vcf file names without file extensions
     else:
         vcf_file_names = retrieve_vcf_files(vcf_directory, 2)

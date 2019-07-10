@@ -16,7 +16,14 @@ dir_to_copy_to = sys.argv[2]  #The folder in which the filtered .vcf.gz files wi
 # - - - - - - - - - - - - - - #File/Folder hierarchies will be copied from the first folder
 min_allele_depth = int(sys.argv[3]) #Minimum number of reads for a line to be copied to the new file
 min_allele_freq = float(sys.argv[4]) #Minimum percentage of variant reads for a line to be copied to the new file
-min_time_genes_read = int(sys.argv[5]) #Minimum number of reads at the locus for a line to be copied to the new file
+try:
+    min_time_genes_read = int(sys.argv[5]) #Minimum number of reads at the locus for a line to be copied to the new file
+except:
+    min_time_genes_read = 0
+try:
+    max_population_frequency = float(sys.argv[6])
+except:
+    max_population_frequency = 1.0
 
 class Header: #The header class contains all of the information necessary to process the VCF
     file_path = ""
@@ -96,7 +103,10 @@ file path
 '''
 def parse_vcf(Header):
     fin = open(Header.file_path, "r") #input is the desired .vcf file
-    fout_path = f"{Header.file_path[:-4]}_filtered_{str(min_allele_depth)}_{str(min_allele_freq)}_{str(min_time_genes_read)}.vcf"
+    fout_path = f"{Header.file_path[:-4]}_filtered_{str(min_allele_depth)}" + \
+                f"_{str(min_allele_freq)}" + \
+                f"_{str(min_time_genes_read)}" + \
+                f"_{str(max_population_frequency)}.vcf"
     fout = open(fout_path, "w+") #output is path/<name>_parsed.vcf; open if necessary
     passed_header = False #to know if the script is still in the header portion of the VCF file
 
@@ -105,6 +115,7 @@ def parse_vcf(Header):
         allele_depth_ok = False
         allele_freq_ok = False
         num_calls_ok = False
+        pop_freq_ok = False
         line_allele_depth = 0
         line_allele_freq = 0.0
         time_gene_read = 0
@@ -143,6 +154,7 @@ def parse_vcf(Header):
 
                 #Getting read algorithm data and declaring depth and freq arrays
                 line_alg_data = get_line_alg_data(line_array, len(line_array), Header.format_position)
+                line_alg_data = line_alg_data[1:4]
                 allele_depth = []
                 allele_freq = []
 
@@ -226,13 +238,41 @@ def parse_vcf(Header):
                     line_allele_freq = average_array_value(allele_freq)
                     line_allele_depth = average_array_value(allele_depth)
 
+                #The following assumes the INFO column comes before the FORMAT column
+                exac_all_ok = False
+                thousand_g_ok = False
+
+                line_info_array = line_array[Header.format_position - 1].split(";")
+                for info in line_info_array:
+                    info = info.lower().strip()
+                    if "exac_all" in info:
+                        info_array = info.split("=")
+                        try:
+                            if (float(info_array[1]) <= max_population_frequency):
+                                exac_all_ok = True
+                        except:
+                            if (info_array[1] == "."):
+                                exac_all_ok = True
+                    elif '1000g2014oct_all' in info:
+                        info_array = info.split("=")
+                        try:
+                            if (float(info_array[1]) <= max_population_frequency):
+                                thousand_g_ok = True
+                        except:
+                            if (info_array[1] == "."):
+                                thousand_g_ok = True
+
+                if (thousand_g_ok == True) and (exac_all_ok == True):
+                    pop_freq_ok = True
+
             #End <passed_header> if statement
         #End <Header.columns> if statement
 
         #If the line meets the necessary conditions, write it to the output file:
         if (time_gene_read >= min_time_genes_read) and \
            (line_allele_freq >= min_allele_freq) and \
-           (line_allele_depth >= min_allele_depth):
+           (line_allele_depth >= min_allele_depth) and \
+           (pop_freq_ok == True):
             fout.write(line)
 
     #End <line> for loop

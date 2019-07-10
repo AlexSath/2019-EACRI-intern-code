@@ -53,8 +53,8 @@ def compare_fingerprints(fingerprint_path_array, fingerprint_name_array, compare
     #to compare each fingerprint with each other fingerprint if it doesn't exist
     current_comp_number = 1
     num_comparisons = fpt.ncr(len(fingerprint_path_array), 2)
-    for (p, n) in zip(fingerprint_path_array, fingerprint_name_array):
-        for (p2, n2) in zip(fingerprint_path_array, fingerprint_name_array):
+    for (p, n) in zip(fingerprint_path_array[::-1], fingerprint_name_array[::-1]):
+        for (p2, n2) in zip(fingerprint_path_array[::-1], fingerprint_name_array[::-1]):
             print(f'Comparing {n} with {n2}... [{current_comp_number}/{num_comparisons + len(fingerprint_path_array)}]') #so you know what is going on...
 
             output_file_path = os.path.join(misc_tsvs_path, n + "~" + n2 + ".tsv")
@@ -67,7 +67,7 @@ def compare_fingerprints(fingerprint_path_array, fingerprint_name_array, compare
             else: #if the comparison doesn't exist, create the csv and fill it with comparison data.
                 file_output = open(output_file_path, "w+")
                 subprocess.call(["perl", script_path, p, p2], stdout=file_output)
-                current_comp_number += 1
+            current_comp_number += 1
 
 
 '''Creates comparisons based on a .csv file tumor_normal key.
