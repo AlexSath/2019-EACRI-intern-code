@@ -41,16 +41,16 @@ def main():
         line = line.replace("\n", "")
         line_array = line.split(",")
         if (current_line == 1):
-            line += ",is_pair\n"
+            line = f"is_pair,{line}\n"
         else:
             for f, s in zip(first_sample_array, second_sample_array):
                 if ((line_array[0] == f) and (line_array[1] == s)) or \
                    ((line_array[1] == f) and (line_array[0] == s)):
                     pair_found = True
             if pair_found:
-                line += ",true\n"
+                line = f"true,{line}\n"
             elif not pair_found:
-                line += ",false\n"
+                line = f"false,{line}\n"
         input_array.append(line)
         current_line += 1
     fin.close()
