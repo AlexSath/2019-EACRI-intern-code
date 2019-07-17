@@ -1,5 +1,5 @@
 import os
-import fingerprint_processing_tools as /fpt
+import fingerprint_processing_tools as fpt
 import subprocess
 import itertools
 

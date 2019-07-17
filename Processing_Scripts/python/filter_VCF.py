@@ -154,7 +154,7 @@ def parse_vcf(Header):
 
                 #Getting read algorithm data and declaring depth and freq arrays
                 line_alg_data = get_line_alg_data(line_array, len(line_array), Header.format_position)
-                line_alg_data = line_alg_data[1:4]
+                line_alg_data = [line_alg_data[1]]
                 allele_depth = []
                 allele_freq = []
 
@@ -401,6 +401,7 @@ def get_header_info(file_input):
     new_header.algorithm_types = get_header_algorithms(new_header.columns, new_header.format_position)
 
     #Function returns the new Header object, fully populated
+    print("Created header...")
     return new_header
 
 if __name__ == "__main__":
