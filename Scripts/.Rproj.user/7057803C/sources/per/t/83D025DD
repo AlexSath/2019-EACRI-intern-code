@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1565365730458.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1260769704",
+    "id" : "83D025DD",
+    "lastKnownWriteTime" : 1563834265,
+    "last_content_update" : 1563834265,
+    "path" : "~/Documents/git/Sathler-BWG-Project-2019/Scripts/comparison_analysis/R/advhist.R",
+    "project_path" : "comparison_analysis/R/advhist.R",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

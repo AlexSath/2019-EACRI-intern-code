@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1565365723459.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4230935992",
+    "id" : "39688966",
+    "lastKnownWriteTime" : 1563909161,
+    "last_content_update" : 1563909161,
+    "path" : "~/Documents/git/Sathler-BWG-Project-2019/Scripts/comparison_analysis/R/hist_all_Ls.R",
+    "project_path" : "comparison_analysis/R/hist_all_Ls.R",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

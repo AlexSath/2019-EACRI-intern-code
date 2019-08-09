@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1565363859784.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1855078573",
+    "id" : "1D35268",
+    "lastKnownWriteTime" : 1563908629,
+    "last_content_update" : 1563908629,
+    "path" : "~/Documents/git/Sathler-BWG-Project-2019/Scripts/comparison_analysis/R/violinplot.R",
+    "project_path" : "comparison_analysis/R/violinplot.R",
+    "properties" : {
+        "cursorPosition" : "24,20",
+        "scrollLine" : "16"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

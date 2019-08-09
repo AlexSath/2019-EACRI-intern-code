@@ -1,0 +1,10 @@
+First arg: Folder where the list of .vcfs can be found {PATHLIKE OBJ.}
+Second arg: Folder where a the filtered .vcfs, their fingerprints, and their comparisons will output {PATHLIKE OBJ.}
+Third arg: A 'categorizer' string. The name that the output folder will inherit {STRING}
+Fourth arg: Minimum allele depth by which the VCFs will be filtered {INT}
+Fifth arg: Minimum allele frequency by which the VCFs will be filtered {FLOAT}
+Sixth arg: Minimum number of algorithms that must be called for a SNV to pass the filter {INT}
+Seventh arg: Maximum reference population allele frequency for a SNV to pass the filter {FLOAT}
+Eigth arg: The path for the Tumor-Normal-Pair key table (must be in CSV form) {PATHLIKE OBJ.}
+Ninth arg: The index for the first algorithm to be considered (in a range) {INT}
+Tenth arg: The index for the last algorithm to be considered (in a range) {FLOAT}

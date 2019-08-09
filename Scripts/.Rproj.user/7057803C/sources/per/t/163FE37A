@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1565363850380.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3772296229",
+    "id" : "163FE37A",
+    "lastKnownWriteTime" : 1565369257,
+    "last_content_update" : 1565369257367,
+    "path" : "~/Documents/git/Sathler-BWG-Project-2019/Scripts/comparison_analysis/R/corrVcomm.R",
+    "project_path" : "comparison_analysis/R/corrVcomm.R",
+    "properties" : {
+        "cursorPosition" : "30,26",
+        "scrollLine" : "9",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
