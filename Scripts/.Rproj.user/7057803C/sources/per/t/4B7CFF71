@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1565630134627.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "604010098",
+    "id" : "4B7CFF71",
+    "lastKnownWriteTime" : 1565645402,
+    "last_content_update" : 1565645402314,
+    "path" : "~/Documents/git/Sathler-BWG-Project-2019/Scripts/comparison_analysis/R/snvsVSfindxs.R",
+    "project_path" : "comparison_analysis/R/snvsVSfindxs.R",
+    "properties" : {
+        "cursorPosition" : "24,20",
+        "scrollLine" : "9"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

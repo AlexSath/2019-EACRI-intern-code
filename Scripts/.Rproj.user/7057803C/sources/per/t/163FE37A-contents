@@ -22,7 +22,7 @@ input_file_name <- path_arr[[1]][len_path]
 
 pdf_name <- paste(output_folder, "/", 
                   gsub('.{4}$', '', path_arr[[1]][len_path]),
-                  "corrVcomm2.pdf", sep = "")
+                  ".corrVcomm2.pdf", sep = "")
 
 graph_title <- paste("from: ", input_file_name, sep = "")
 g <- ggplot(melted_comm_data, aes(x = numshared, y = l_200)) + 
@@ -33,6 +33,6 @@ g <- ggplot(melted_comm_data, aes(x = numshared, y = l_200)) +
      labs( x = 'Number of _ Shared Between Sample Pairs',
            y = 'Correlation at L_200')
 
-pdf(pdf_name)
+pdf(pdf_name, width = 12, height = 7)
 print(g)
 dev.off()

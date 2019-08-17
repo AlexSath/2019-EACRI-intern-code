@@ -10,24 +10,32 @@ import itertools
 import subprocess
 import numpy as np
 
+file_path = os.path.abspath(__file__)
+current_dir_path = os.path.dirname(file_path)
 
-ttnnp_file = sys.argv[1]
-fAnalyses_path = os.path.abspath(os.path.join(os.path.dirname(ttnnp_file), '..', '..', 'fAnalyses'))
-if os.path.isdir(fAnalyses_path) is not True:
-    sys.exit(f"Was not able to find fAnalyses using the ttnnp filepath")
-if os.path.isfile(ttnnp_file) is not True:
-    sys.exit(f"The first argument must be a valid file path. You entered '{ttnnp_file}'")
-max_or_min = sys.argv[2]
-if (max_or_min != 'max') and (max_or_min != 'min'):
-    sys.exit(f"The second argument must be 'max' or 'min'. You entered {max_or_min}")
-filter = sys.argv[3]
-key_file = sys.argv[4]
-rawAnalyses_path = sys.argv[5]
-comp_types = sys.argv[6].split(',')
-try:
-    float(filter)
-except:
-    sys.exit(f"The fourth argument failed to become a float. It must be type float.")
+if '--help' in sys.argv:
+    with open(os.path.join(current_dir_path, "helptext", "find_shared_SNVs_FingIndex.txt"), 'r') as fin:
+        for line in fin:
+            print(line)
+    sys.exit()
+else:
+    ttnnp_file = sys.argv[1]
+    fAnalyses_path = os.path.abspath(os.path.join(os.path.dirname(ttnnp_file), '..', '..', 'fAnalyses'))
+    if os.path.isdir(fAnalyses_path) is not True:
+        sys.exit(f"Was not able to find fAnalyses using the ttnnp filepath")
+    if os.path.isfile(ttnnp_file) is not True:
+        sys.exit(f"The first argument must be a valid file path. You entered '{ttnnp_file}'")
+    max_or_min = sys.argv[2]
+    if (max_or_min != 'max') and (max_or_min != 'min'):
+        sys.exit(f"The second argument must be 'max' or 'min'. You entered {max_or_min}")
+    filter = sys.argv[3]
+    key_file = sys.argv[4]
+    rawAnalyses_path = sys.argv[5]
+    comp_types = sys.argv[6].split(',')
+    try:
+        float(filter)
+    except:
+        sys.exit(f"The fourth argument failed to become a float. It must be type float.")
 
 
 def main():

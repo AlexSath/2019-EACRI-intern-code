@@ -1,0 +1,5 @@
+--INFO--
+This file will search for all 'all_comparisons'-type CSVs in a folder, remove all comparisons that have samples that are not found in the provided tumor-normal-key, and finally, process and graph the resulting filtered CSV data.
+--ARGS--
+First arg: Tumor-Normal-Key path. Should have 'tumor_id' and 'normal_id' as column headers in the first line of the file. {PATHLIKE OBJ.}
+Second arg: Directory to search for CSV files. {PATHLIKE OBJ.}

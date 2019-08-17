@@ -50,19 +50,19 @@ therefore sub-directories as well)
 is_path [integer]: if 1, the function will output file paths to the files array.
 Otherwise, the function will output file names to the files array
 '''
-def retrieve_vcf_files(vcf_path, string):
+def retrieve_vcf_files(vcf_path, string1):
     names_paths = [[], []]
     # r=root, d=directories, f=files
     for r, d, f in os.walk(vcf_path):
         for file in f:
             file_path = os.path.join(r, file)
             file_path_arr = file_path[1:].split('/')
-            if '_filtered_' in file and string in file:
-                if (file_path_arr[-2] == "exome"):
+            if '_filtered_' in file and string1 in file:
+                if (file_path_arr[-2] == "exome") or (file_path_arr[-2] == "Analysis") or (".vcf.gz" in file_path_arr[-2]):
                     names_paths[0].append(file[:-7])
                     names_paths[1].append(os.path.join(r, file))
-            if string in file and '_filtered_' not in file:
-                if file_path_arr[-6] not in names_paths[0]:
+            if string1 in file and '_filtered_' not in file:
+                if file_path_arr[-7] not in names_paths[0]:
                     names_paths[0].append(file_path_arr[-7])
                 else:
                     names_paths[0].append(f"{file_path_arr[-7]}~2")

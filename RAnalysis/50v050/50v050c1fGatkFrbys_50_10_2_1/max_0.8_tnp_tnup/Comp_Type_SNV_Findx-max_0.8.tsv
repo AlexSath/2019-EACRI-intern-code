@@ -1,0 +1,13 @@
+##Source: /Users/asathler/Documents/Fingerprinting/post-fix/50_v050/50v050c1fGatkFrbys_50_10_2_1/Comparisons/_f50-v050-pairs/50v050c1fGatkFrbys_50_10_2_1.ttnnp.csv
+##Filter: max correlation of 0.8 for ['tumor-normal-pair', 'tumor-normal-unpaired']
+##First Number: SNV data, Second Number: Fingerprint Index data
+## _ = 'shared SNVs/Findxs'
+#type	numcomp	mean _	med. _	std. _	min. _	max. _
+tt:	1	0	0	0	0	0
+   	1	0	0	0	0	0
+nn:	1	0	0	0	0	0
+   	1	0	0	0	0	0
+tnp:	54	1663	666	5004	0	36942
+    	54	6460	4337	4665	23	15104
+tnup:	2808	471	130	1436	0	29108
+     	2808	3683	3108	2001	16	8744

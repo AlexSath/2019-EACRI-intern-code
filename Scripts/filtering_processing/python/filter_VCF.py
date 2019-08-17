@@ -287,7 +287,7 @@ def parse_vcf(Header, input_path, output_path):
                                 if (info_array[1] == "."):
                                     thousand_g_ok = True
 
-                    if (thousand_g_ok == True) and (exac_all_ok == True):
+                    if ((thousand_g_ok == True) and (exac_all_ok == True)) or max_pop_freq == 100:
                         pop_freq_ok = True
                 #End <passed_header> if statement
             #End <Header.columns> if statement

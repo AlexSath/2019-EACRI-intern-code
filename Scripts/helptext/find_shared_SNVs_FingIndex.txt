@@ -1,0 +1,9 @@
+--INFO--
+This script will look at a ttnnp CSV file and dissect the comparisons with correlations above or below a desired cutoff. The SNVs and 'Fingerprint Indexes' (a word for the data that is created out of SNVs in Glusman's method) for the samples that go into these comparisons are extracted before and after filters are performed. Then, means, medians, standard deviations, maximums, and minimums are found for sample types and comparison types for the SNVs and Fingerprint Indexes that are shared and not shared during comparison. This information is outputted into three TSVs. The information stored in the .comm.tsv can then be graphed and visualized using 'snvsVSfindxs.R' and 'corrVcomm.R'.
+--ARGS--
+First arg: The .ttnnp.csv file input. This file should have the samples being compared in the first column, L_200 in the second-to-last column, and the comparison type in the last column. {PATHLIKE OBJ.}
+Second arg: Whether the script sets the filter as a maximum or a minimum. Should be 'max' or 'min'. {STRING}
+Third arg: The decimal comparison value that serves as the maximum or the minimum to which all L_200 comparisons will be compared to. Comparisons that pass the filter will be used for data summary and graphing. {FLOAT}
+Fourth arg: A tumor-normal-key file in csv format. It should have 'tumor_id' and 'normal_id' as the two columns and these should be in the first line of the file. {PATHLIKE OBJ.}
+Fifth arg: The folder where all of the raw VCFs can be found. Use an absolute path. {PATHLIKE OBJ.}
+Sixth arg: The comparison types that you want to include in your data summary. When using the process as intended, the four options are 'tumor-tumor', 'normal-normal', 'tumor-normal-pair', and 'tumor-normal-unpaired'. Values should be separated by commas without spaces. {COMMA-SEPARATED STRING}

@@ -1,10 +1,13 @@
-First arg: Folder where the list of .vcfs can be found {PATHLIKE OBJ.}
-Second arg: Folder where a the filtered .vcfs, their fingerprints, and their comparisons will output {PATHLIKE OBJ.}
-Third arg: A 'categorizer' string. The name that the output folder will inherit {STRING}
+--INFO--
+The most importand file in the process. If anything, this files coordinates the operations of other scripts rather than doing any operating itself. This script will create a new folder in which filtered vcfs, their fingerprints, and the comparisons for these fingerprints are dumped. Afterwards, the results of these comparisons are graphed with violin plots and box plots to understand the result of the comparison.
+--ARGS--
+First arg: Folder where the list of .vcfs can be found. {PATHLIKE OBJ.}
+Second arg: Folder where all the filtered .vcfs, their fingerprints, and their comparisons will output. {PATHLIKE OBJ.}
+Third arg: A 'categorizer' string. The name that the output folder will inherit. This is totally arbitrary and only helps the user organize folders and data. {STRING}
 Fourth arg: Minimum allele depth by which the VCFs will be filtered {INT}
-Fifth arg: Minimum allele frequency by which the VCFs will be filtered {FLOAT}
-Sixth arg: Minimum number of algorithms that must be called for a SNV to pass the filter {INT}
-Seventh arg: Maximum reference population allele frequency for a SNV to pass the filter {FLOAT}
-Eigth arg: The path for the Tumor-Normal-Pair key table (must be in CSV form) {PATHLIKE OBJ.}
+Fifth arg: Minimum allele frequency by which the VCFs will be filtered. Number is interpreted as a percentage. {FLOAT}
+Sixth arg: Minimum number of algorithms that must be called for a SNV to pass the filter. {INT}
+Seventh arg: Maximum reference population allele frequency for a SNV to pass the filter. Number is interpreted as a percentage. {FLOAT}
+Eigth arg: The path for the Tumor-Normal-Pair key table (must be in CSV form). 'tumor_id' and 'normal_id' should be column headers and be in the first line of the file. {PATHLIKE OBJ.}
 Ninth arg: The index for the first algorithm to be considered (in a range) {INT}
 Tenth arg: The index for the last algorithm to be considered (in a range) {FLOAT}

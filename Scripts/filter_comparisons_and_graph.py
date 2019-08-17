@@ -8,10 +8,17 @@ import subprocess
 
 script_path = os.path.abspath(__file__)
 script_dir = os.path.dirname(script_path)
-tnp_key = sys.argv[1]
-tnp_name = ntpath.basename(tnp_key)[:-4]
-dir_to_search = sys.argv[2]
-swp = '_filtered'
+
+if '--help' in sys.argv:
+    with open(os.path.join(script_dir, "helptext", "filter_comparisons_and_graph.txt"), 'r') as fin:
+        for line in fin:
+            print(line)
+    sys.exit()
+else:
+    tnp_key = sys.argv[1]
+    tnp_name = ntpath.basename(tnp_key)[:-4]
+    dir_to_search = sys.argv[2]
+    swp = '_filtered'
 
 def main():
     tumor_arr = []
